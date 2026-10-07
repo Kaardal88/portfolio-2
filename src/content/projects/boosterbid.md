@@ -42,6 +42,6 @@ reflection:
   next: "If this were a customer project and not a school project, I think I would have one more look at the details card. That's the place you would place your bids and it wouldn't hurt to make it look better."
 ---
 
-[Two or three sentences about the brief: what the project was, who it was for and what problem it solved.]
+The brief was to create a webside for a new autcion house in town. It was a semester project, so we had to use everything we have learned.
 
-[The goal in one sentence.]
+The goal was to work with Noroff API and create functionality for authorization, register, login, post listing, place bids on an auction, render wins and edit profile functionality.

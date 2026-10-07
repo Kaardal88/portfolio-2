@@ -459,7 +459,11 @@ const rate = started ? Math.round((shipped / started) * 100) : 0;
       grid-template-columns: minmax(0, 1fr);
     }
     .counter__hand {
-      display: none;
+      position: static;
+      align-self: flex-end;
+      font-size: 1.5rem;
+      text-align: right;
+      transform: rotate(-4deg);
     }
     .lab-end__note {
       position: static;
