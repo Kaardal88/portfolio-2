@@ -56,15 +56,18 @@ const isCurrent = (href: string) =>
     </nav>
   </div>
 </header>
+<div class="menu-backdrop" aria-hidden="true" data-menu-backdrop></div>
 
 <script>
   const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
   const menu = document.querySelector<HTMLElement>('[data-menu]');
+  const backdrop = document.querySelector<HTMLElement>('[data-menu-backdrop]');
 
   if (toggle && menu) {
     const setOpen = (open: boolean) => {
       toggle.setAttribute('aria-expanded', String(open));
       menu.classList.toggle('is-open', open);
+      backdrop?.classList.toggle('is-open', open);
       document.body.classList.toggle('menu-open', open);
     };
     toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
@@ -77,6 +80,7 @@ const isCurrent = (href: string) =>
     menu.addEventListener('click', (e) => {
       if ((e.target as HTMLElement).closest('a')) setOpen(false);
     });
+    backdrop?.addEventListener('click', () => setOpen(false));
   }
 </script>
 
@@ -85,9 +89,17 @@ const isCurrent = (href: string) =>
     position: sticky;
     top: 0;
     z-index: 50;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  /* Blur lives on a pseudo-element: backdrop-filter on .header itself would
+     make it the containing block for the fixed mobile nav. */
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
     background: color-mix(in srgb, var(--color-bg) 82%, transparent);
     backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
   .header__inner {
     display: flex;
@@ -213,13 +225,16 @@ const isCurrent = (href: string) =>
     }
     .header__nav {
       position: fixed;
-      inset: 4rem 0 0 0;
+      inset: 4rem 0 auto 0;
+      max-height: calc(100dvh - 4rem);
+      overflow-y: auto;
       flex-direction: column;
       align-items: stretch;
       justify-content: flex-start;
       gap: var(--space-6);
       padding: var(--space-7) var(--gutter);
       background: var(--color-bg);
+      border-bottom: 1px solid var(--color-line);
       transform: translateY(-0.5rem);
       opacity: 0;
       visibility: hidden;
@@ -256,6 +271,31 @@ const isCurrent = (href: string) =>
     }
     .header__cta {
       align-self: flex-start;
+    }
+  }
+</style>
+<style>
+  .menu-backdrop {
+    display: none;
+  }
+  @media (max-width: 860px) {
+    .menu-backdrop {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        opacity var(--dur),
+        visibility 0s linear var(--dur);
+    }
+    .menu-backdrop.is-open {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity var(--dur);
     }
   }
 </style>
