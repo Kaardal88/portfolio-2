@@ -54,6 +54,8 @@ export class Brain {
   private pulses: Pulse[] = [];
 
   private focusId: string | null = null;
+  // What was focused when the current press started (before any focus event it caused).
+  private pressFocus: string | null | undefined;
   private speed = 1;
   private target = 1;
   private dim = 0;
@@ -107,12 +109,20 @@ export class Brain {
       el.addEventListener('pointerenter', (e) => {
         if (e.pointerType !== 'touch') this.focus(id);
       });
-      el.addEventListener('pointerleave', () => this.focus(null));
+      el.addEventListener('pointerleave', (e) => {
+        if (e.pointerType !== 'touch') this.focus(null);
+      });
+      el.addEventListener('pointerdown', () => {
+        this.pressFocus = this.focusId;
+      });
       el.addEventListener('focus', () => this.focus(id));
       el.addEventListener('blur', () => this.focus(null));
-      // Touch: first tap focuses, second tap follows the link.
+      // Touch: first tap focuses, second tap follows the link. Tapping a link
+      // focuses it before the click lands, so compare with the state at pointerdown.
       el.addEventListener('click', (e) => {
-        if (this.focusId !== id) {
+        const before = this.pressFocus === undefined ? this.focusId : this.pressFocus;
+        this.pressFocus = undefined;
+        if (before !== id) {
           e.preventDefault();
           this.focus(id);
         }
