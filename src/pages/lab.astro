@@ -8,7 +8,6 @@ const categoryOrder = ['music', 'games', 'art', 'wood'];
 const hobbies = (await getCollection('hobbies')).sort(
   (a, b) => categoryOrder.indexOf(a.data.category) - categoryOrder.indexOf(b.data.category),
 );
-const failed = (await getCollection('failed')).sort((a, b) => a.id.localeCompare(b.id));
 
 const filters = [
   { id: 'all', label: 'All' },
@@ -26,7 +25,7 @@ const failedCount = Math.max(0, started - shipped);
 const rate = started ? Math.round((shipped / started) * 100) : 0;
 ---
 
-<BaseLayout title="Lab" description="Side quests and other questionable decisions: music, games, art, woodturning and the projects that successfully failed.">
+<BaseLayout title="Lab" description="Side quests and other questionable decisions: music, games, art, woodturning and more.">
   <section class="container lab-hero" aria-labelledby="lab-title">
     <div class="lab-hero__text">
       <p class="eyebrow">The Lab / What the brain does after hours</p>
@@ -34,8 +33,7 @@ const rate = started ? Math.round((shipped / started) * 100) : 0;
         Side quests<br />&amp; other <span class="accent">questionable</span><br />decisions.
       </h1>
       <p class="lead">
-        Client work pays the bills. This is what keeps the brain warm: a band, games built with AI as a co-pilot, art,
-        and a lathe I probably should not be trusted with. Just hints, no essays.
+       Since my brain doesn't stop working after hours, I always have a few side quests to keep it warm. I've been working on a few of them for years, and I'm always looking for new ones to add to the mix.
       </p>
     </div>
 
@@ -48,7 +46,7 @@ const rate = started ? Math.round((shipped / started) * 100) : 0;
       </dl>
       <div class="counter__bar" aria-hidden="true"><span style={`--pct:${rate}%`}></span></div>
       <p class="mono counter__note">Success rate: {rate}%. Learning rate: 100%.</p>
-      <p class="hand counter__hand" aria-hidden="true">the numbers are<br />brutally honest</p>
+      <p class="hand counter__hand" aria-hidden="true">The numbers are<br />brutally "honest"</p>
     </div>
   </section>
 
@@ -73,7 +71,18 @@ const rate = started ? Math.round((shipped / started) * 100) : 0;
         hobbies.map((h) => (
           <li class="hobby" data-category={h.data.category}>
             <div class="hobby__media">
-              {h.data.image ? (
+              {h.data.video ? (
+                <video
+                  src={h.data.video}
+                  poster={h.data.image}
+                  aria-label={h.data.imageAlt}
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                />
+              ) : h.data.image ? (
                 <img src={h.data.image} alt={h.data.imageAlt ?? ''} loading="lazy" />
               ) : (
                 <div class="placeholder">[{h.data.imagePlaceholder}]</div>
@@ -102,53 +111,6 @@ const rate = started ? Math.round((shipped / started) * 100) : 0;
         ))
       }
     </ul>
-  </section>
-
-  <section class="failed section-pad" aria-labelledby="failed-title">
-    <div class="container">
-      <div class="failed__head">
-        <div>
-          <p class="eyebrow amber">The archive of almost</p>
-          <h2 id="failed-title" class="display failed__title">Successfully<br /><span class="outline">failed.</span></h2>
-        </div>
-        <p class="lead">
-          Unfinished projects, honestly labelled. None of them shipped, all of them taught me something the finished ones
-          did not.
-        </p>
-      </div>
-      <ul class="graves" role="list">
-        {
-          failed.map((g) => (
-            <li class="grave">
-              <span class="stamp" aria-hidden="true">Successfully failed</span>
-              <span class="mono grave__when">{g.data.when}</span>
-              <h3>{g.data.title}</h3>
-              <p class="grave__idea">{g.data.idea}</p>
-              <div class="grave__progress">
-                <div class="grave__row">
-                  <span class="label mono">Got to</span>
-                  <span class="mono amber">{g.data.progress}%</span>
-                </div>
-                <div
-                  class="grave__bar"
-                  role="progressbar"
-                  aria-label="How far it got"
-                  aria-valuenow={g.data.progress}
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                >
-                  <span style={`--pct:${g.data.progress}%`} />
-                </div>
-              </div>
-              <div class="grave__lesson">
-                <span class="label mono">What it taught me</span>
-                <p>{g.data.lesson}</p>
-              </div>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
   </section>
 
   <section class="container section-pad lab-end" aria-labelledby="end-title">
@@ -235,8 +197,7 @@ const rate = started ? Math.round((shipped / started) * 100) : 0;
     flex-direction: column;
     gap: var(--space-6);
   }
-  .lab-hero__title,
-  .failed__title {
+  .lab-hero__title {
     font-size: clamp(2.75rem, 1rem + 7vw, 6rem);
     overflow-wrap: break-word;
   }
@@ -376,6 +337,7 @@ const rate = started ? Math.round((shipped / started) * 100) : 0;
     border-right: 1px solid rgba(255, 255, 255, 0.06);
   }
   .hobby__media img,
+  .hobby__media video,
   .hobby__media .placeholder {
     position: absolute;
     inset: 0;
@@ -459,97 +421,6 @@ const rate = started ? Math.round((shipped / started) * 100) : 0;
     text-align: right;
   }
 
-  .failed {
-    border-top: 1px solid var(--color-line);
-  }
-  .failed__head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: var(--space-6);
-    margin-bottom: var(--space-7);
-  }
-  .failed__head .eyebrow {
-    margin-bottom: var(--space-4);
-  }
-  .outline {
-    color: transparent;
-    -webkit-text-stroke: 1.5px var(--color-amber);
-  }
-  .graves {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-5);
-    margin: 0;
-    padding: 0;
-  }
-  .grave {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-    padding: var(--space-6);
-    background: var(--color-surface-2);
-    border: 1px dashed rgba(255, 255, 255, 0.16);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-  }
-  .grave h3 {
-    padding-right: 9rem;
-    font-size: 1.625rem;
-    font-weight: 700;
-    line-height: 1.15;
-  }
-  .grave__when {
-    padding-right: 9rem;
-    font-size: 0.6875rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: #7d8793;
-  }
-  .grave__idea {
-    font-size: 0.9375rem;
-    color: var(--color-text-muted);
-  }
-  .grave__row {
-    display: flex;
-    justify-content: space-between;
-    font-size: var(--text-xs);
-  }
-  .grave__bar {
-    height: 4px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.08);
-    overflow: hidden;
-  }
-  .grave__bar span {
-    display: block;
-    width: var(--pct);
-    height: 100%;
-    background: var(--color-amber);
-  }
-  .grave__lesson {
-    padding-top: var(--space-4);
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
-  }
-  .stamp {
-    position: absolute;
-    right: 1.1rem;
-    top: 1.6rem;
-    padding: 0.5rem 0.75rem;
-    border: 2px solid var(--color-amber);
-    border-radius: 6px;
-    color: var(--color-amber);
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    transform: rotate(-9deg);
-    opacity: 0.92;
-  }
-
   .lab-end {
     position: relative;
     display: flex;
@@ -582,9 +453,6 @@ const rate = started ? Math.round((shipped / started) * 100) : 0;
     .hobbies {
       grid-template-columns: minmax(0, 1fr);
     }
-    .graves {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
   }
   @media (max-width: 1000px) {
     .lab-hero {
@@ -606,9 +474,6 @@ const rate = started ? Math.round((shipped / started) * 100) : 0;
       min-height: 12rem;
       border-right: none;
       border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    .graves {
-      grid-template-columns: minmax(0, 1fr);
     }
     .counter__grid dd {
       font-size: 2.5rem;

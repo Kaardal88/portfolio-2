@@ -1,35 +1,34 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
-import { site } from '../site.config';
+
 
 const principles = [
-  { title: 'Human-first', text: '[What this means in your work, one or two sentences.]' },
-  { title: 'Ship, then improve', text: '[How you work in iterations, and why.]' },
-  { title: 'Curiosity is a skill', text: '[How side quests feed back into client work.]' },
+  { title: 'Human-first', text: 'I love to think about the user and how they use the product. I always want to discuss new features with my clients and users.' },
+  { title: 'Ship, then improve', text: 'I believe in shipping early and often, then iterating based on feedback.' },
+  { title: 'Curiosity is a skill', text: 'I always stay curious and explore new ideas, which helps me bring fresh perspectives to client work.' },
 ];
-const skills = ['[HTML]', '[CSS]', '[JavaScript]', '[TypeScript]', '[React]', '[Astro]', '[Figma]', '[Git]'];
+const skills = ['[HTML]', '[CSS]', '[JavaScript]', '[TypeScript]', '[React]', '[Astro]', '[Figma]', '[Git]', '[NextJs]', '[Tailwind]', '[AI]', '[Postgres]', '[Supabase]'];
 ---
 
 <BaseLayout title="About" description="Who Kim-André Kårdal is, how he works and what he is good at.">
   <section class="container about">
     <div class="about__photo">
-      <div class="placeholder about__ph">[Portrait photo]</div>
+      <img src="/images/kimmen.jpg" alt="Portrait photo" loading="lazy" decoding="async" />
+
     </div>
     <div class="about__text">
       <p class="eyebrow">About</p>
       <h1 class="display about__title">Same brain.<br /><span class="accent">More ideas.</span></h1>
       <p class="about__lead">
-        [Two or three sentences in your own voice: who you are, where you are based and what kind of work you want more
-        of.]
+        I am a frontend developer who likes to combine my love for music, art and making things with my hands with my work. I'm located outside Bergen, Norway. I have a thing for building things that matters to people, and I like to do it in a way that is human-first, easy to use and last but not least, fun and creative!
       </p>
       <p class="about__body">
-        [A short paragraph about your path into development, what you are studying, and what you bring from music, art
-        and making things with your hands.]
+
       </p>
       <div class="about__actions">
         <a class="btn" href="/contact/">Work with me <Icon name="arrow-right" size={18} /></a>
-        <a class="link-arrow" href={site.introVideoUrl}>Watch the intro <Icon name="arrow-right" /></a>
+
       </div>
     </div>
   </section>

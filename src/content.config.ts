@@ -79,20 +79,10 @@ const hobbies = defineCollection({
     hint: z.string(),
     image: z.string().optional(),
     imageAlt: z.string().optional(),
+    video: z.string().optional(), // path under /public, e.g. /video/clip.mp4. Takes priority over image.
     imagePlaceholder: z.string(),
     specs: z.array(z.object({ label: z.string(), value: z.string() })),
   }),
 });
 
-const failed = defineCollection({
-  loader: file("./src/content/lab/failed.json"),
-  schema: z.object({
-    when: z.string(),
-    title: z.string(),
-    idea: z.string(),
-    progress: z.number().min(0).max(100),
-    lesson: z.string(),
-  }),
-});
-
-export const collections = { projects, hobbies, failed };
+export const collections = { projects, hobbies };
