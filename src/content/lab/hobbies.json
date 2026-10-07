@@ -1,0 +1,66 @@
+[
+  {
+    "id": "band",
+    "category": "music",
+    "categoryLabel": "Music",
+    "title": "The band",
+    "status": "Rehearsing",
+    "statusTone": "active",
+    "hint": "Same brain, different frequency. [Band name], where I play [instrument] and occasionally argue about tempo.",
+    "imagePlaceholder": "Photo: the band live or in rehearsal",
+    "specs": [
+      { "label": "Role", "value": "[Instrument]" },
+      { "label": "Genre", "value": "[Genre]" },
+      { "label": "Setlist", "value": "[Number] songs" },
+      { "label": "Overlap with code", "value": "Timing. Always timing." }
+    ]
+  },
+  {
+    "id": "game-dev",
+    "category": "games",
+    "categoryLabel": "Game dev + AI",
+    "title": "Games with an AI co-pilot",
+    "status": "Prototyping",
+    "statusTone": "active",
+    "hint": "Using AI workflows to prototype game ideas faster than I can forget them. Some are playable, most are gloriously broken.",
+    "imagePlaceholder": "GIF: a prototype in motion",
+    "specs": [
+      { "label": "Engine", "value": "[Engine]" },
+      { "label": "Workflow", "value": "AI-assisted prototyping" },
+      { "label": "Prototypes", "value": "[Number]" },
+      { "label": "Playable", "value": "Define playable" }
+    ]
+  },
+  {
+    "id": "art",
+    "category": "art",
+    "categoryLabel": "Art",
+    "title": "Art",
+    "status": "Ongoing",
+    "statusTone": "ongoing",
+    "hint": "Design thinking without a grid. [What kind of art you make], mostly away from screens.",
+    "imagePlaceholder": "Image: a piece you like",
+    "specs": [
+      { "label": "Medium", "value": "[Medium]" },
+      { "label": "Style", "value": "[Style]" },
+      { "label": "Undo button", "value": "Sadly not" },
+      { "label": "Feeds into", "value": "Colour, composition, UI" }
+    ]
+  },
+  {
+    "id": "woodturning",
+    "category": "wood",
+    "categoryLabel": "Woodturning",
+    "title": "Woodturning",
+    "status": "New obsession",
+    "statusTone": "new",
+    "hint": "Newest side quest. Real materials, real consequences and no Ctrl+Z.",
+    "imagePlaceholder": "Photo: first bowl, flaws included",
+    "specs": [
+      { "label": "Started", "value": "2026" },
+      { "label": "Lathe", "value": "[Model]" },
+      { "label": "Bowls survived", "value": "[Number]" },
+      { "label": "Fingers", "value": "All ten" }
+    ]
+  }
+]

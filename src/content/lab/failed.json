@@ -1,0 +1,26 @@
+[
+  {
+    "id": "failed-1",
+    "when": "[Year] · [Type of project]",
+    "title": "[Abandoned idea #1]",
+    "idea": "[One line on what it was supposed to be.]",
+    "progress": 70,
+    "lesson": "[What you learned, e.g. scope before you start]"
+  },
+  {
+    "id": "failed-2",
+    "when": "[Year] · [Type of project]",
+    "title": "[Abandoned idea #2]",
+    "idea": "[One line on what it was supposed to be.]",
+    "progress": 35,
+    "lesson": "[What you learned]"
+  },
+  {
+    "id": "failed-3",
+    "when": "[Year] · [Type of project]",
+    "title": "[Abandoned idea #3]",
+    "idea": "[One line on what it was supposed to be.]",
+    "progress": 90,
+    "lesson": "[What you learned, e.g. the last 10% is 90% of the work]"
+  }
+]

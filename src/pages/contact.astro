@@ -1,0 +1,93 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { site } from '../site.config';
+---
+
+<BaseLayout title="Contact" description="Freelance front-end work: websites, web apps and interfaces. Tell me what you are building.">
+  <section class="container contact">
+    <div class="contact__intro">
+      <p class="eyebrow">Contact</p>
+      <h1 class="display contact__title">Got an idea that needs to <span class="accent">move?</span></h1>
+      <p class="lead">
+        I take on freelance front-end work: websites, web apps and interfaces. Tell me what you are building and where it
+        is stuck. I usually reply within [a couple of days].
+      </p>
+      <dl class="contact__direct">
+        <div>
+          <dt class="mono">Email</dt>
+          <dd><a href={`mailto:${site.email}`}>{site.email}</a></dd>
+        </div>
+        <div>
+          <dt class="mono">Elsewhere</dt>
+          <dd>
+            <a href={site.github} rel="me noopener" target="_blank">GitHub</a> ·
+            <a href={site.linkedin} rel="me noopener" target="_blank">LinkedIn</a>
+          </dd>
+        </div>
+      </dl>
+      <p class="hand contact__note" aria-hidden="true">no idea is too<br />half-baked</p>
+    </div>
+    <div class="contact__form">
+      <ContactForm />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: var(--space-8);
+    padding-block: var(--space-9);
+  }
+  .contact__intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  .contact__title {
+    font-size: var(--text-3xl);
+    font-stretch: 78%;
+  }
+  .contact__direct {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-line);
+  }
+  .contact__direct dt {
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .contact__direct a {
+    display: inline-block;
+    padding-block: var(--space-2);
+    color: var(--color-text-soft);
+  }
+  .contact__direct a:hover {
+    color: var(--color-accent);
+  }
+  .contact__note {
+    font-size: 1.75rem;
+    transform: rotate(-6deg);
+    align-self: flex-start;
+    margin-top: var(--space-4);
+  }
+  .contact__form {
+    padding: clamp(1.25rem, 0.5rem + 3vw, 3rem);
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+  }
+
+  @media (max-width: 960px) {
+    .contact {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-7);
+    }
+  }
+</style>

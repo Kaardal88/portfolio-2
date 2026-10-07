@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+---
+
+<BaseLayout title="Page not found">
+  <section class="container lost">
+    <span class="stamp" aria-hidden="true">Successfully failed</span>
+    <p class="eyebrow">Error 404</p>
+    <h1 class="display lost__title">This thought<br />never <span class="outline">finished.</span></h1>
+    <p class="lead">
+      The page you were looking for drifted off somewhere. It happens to the best ideas. Let's get you back to the ones
+      that shipped.
+    </p>
+    <div class="lost__actions">
+      <a class="btn" href="/">Back to the brain <Icon name="arrow-right" size={18} /></a>
+      <a class="link-arrow" href="/lab/">See other unfinished things <Icon name="arrow-right" /></a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .lost {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    min-height: 70svh;
+    justify-content: center;
+    padding-block: var(--space-9);
+  }
+  .lost__title {
+    font-size: var(--text-hero);
+  }
+  .outline {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--color-amber);
+  }
+  .lost__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-5) var(--space-6);
+  }
+  .stamp {
+    position: absolute;
+    right: var(--gutter);
+    top: 30%;
+    padding: 0.75rem 1rem;
+    border: 3px solid var(--color-amber);
+    border-radius: 8px;
+    color: var(--color-amber);
+    font-family: var(--font-mono);
+    font-size: clamp(0.875rem, 0.6rem + 1vw, 1.25rem);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    transform: rotate(-12deg);
+  }
+  @media (max-width: 700px) {
+    .stamp {
+      position: static;
+      align-self: flex-start;
+      transform: rotate(-4deg);
+    }
+  }
+</style>

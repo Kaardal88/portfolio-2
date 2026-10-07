@@ -1,0 +1,617 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../site.config';
+
+const categoryOrder = ['music', 'games', 'art', 'wood'];
+const hobbies = (await getCollection('hobbies')).sort(
+  (a, b) => categoryOrder.indexOf(a.data.category) - categoryOrder.indexOf(b.data.category),
+);
+const failed = (await getCollection('failed')).sort((a, b) => a.id.localeCompare(b.id));
+
+const filters = [
+  { id: 'all', label: 'All' },
+  { id: 'music', label: 'Music' },
+  { id: 'games', label: 'Game dev + AI' },
+  { id: 'art', label: 'Art' },
+  { id: 'wood', label: 'Woodturning' },
+].map((f) => ({
+  ...f,
+  count: f.id === 'all' ? hobbies.length : hobbies.filter((h) => h.data.category === f.id).length,
+}));
+
+const { started, shipped } = site.ideas;
+const failedCount = Math.max(0, started - shipped);
+const rate = started ? Math.round((shipped / started) * 100) : 0;
+---
+
+<BaseLayout title="Lab" description="Side quests and other questionable decisions: music, games, art, woodturning and the projects that successfully failed.">
+  <section class="container lab-hero" aria-labelledby="lab-title">
+    <div class="lab-hero__text">
+      <p class="eyebrow">The Lab / What the brain does after hours</p>
+      <h1 id="lab-title" class="display lab-hero__title">
+        Side quests<br />&amp; other <span class="accent">questionable</span><br />decisions.
+      </h1>
+      <p class="lead">
+        Client work pays the bills. This is what keeps the brain warm: a band, games built with AI as a co-pilot, art,
+        and a lathe I probably should not be trusted with. Just hints, no essays.
+      </p>
+    </div>
+
+    <div class="counter" data-counter>
+      <p class="label mono">Live idea counter</p>
+      <dl class="counter__grid">
+        <div><dt class="mono">Ideas started</dt><dd data-count={started}>{started}</dd></div>
+        <div><dt class="mono">Shipped</dt><dd class="accent" data-count={shipped}>{shipped}</dd></div>
+        <div><dt class="mono">Successfully failed</dt><dd class="amber" data-count={failedCount}>{failedCount}</dd></div>
+      </dl>
+      <div class="counter__bar" aria-hidden="true"><span style={`--pct:${rate}%`}></span></div>
+      <p class="mono counter__note">Success rate: {rate}%. Learning rate: 100%.</p>
+      <p class="hand counter__hand" aria-hidden="true">the numbers are<br />brutally honest</p>
+    </div>
+  </section>
+
+  <section class="container section-pad" aria-labelledby="orbit-title" data-filter-root>
+    <div class="lab-head">
+      <h2 id="orbit-title" class="display lab-head__title">Currently in orbit</h2>
+      <div class="filters" role="group" aria-label="Filter side quests">
+        {
+          filters.map((f) => (
+            <button type="button" class="filter" aria-pressed={f.id === 'all' ? 'true' : 'false'} data-filter={f.id}>
+              {f.label}
+              <span class="filter__count">{f.count}</span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+    <p class="visually-hidden" aria-live="polite" data-filter-status></p>
+
+    <ul class="hobbies" role="list">
+      {
+        hobbies.map((h) => (
+          <li class="hobby" data-category={h.data.category}>
+            <div class="hobby__media">
+              {h.data.image ? (
+                <img src={h.data.image} alt={h.data.imageAlt ?? ''} loading="lazy" />
+              ) : (
+                <div class="placeholder">[{h.data.imagePlaceholder}]</div>
+              )}
+              <span class="hobby__cat mono">{h.data.categoryLabel}</span>
+            </div>
+            <div class="hobby__body">
+              <div class="hobby__top">
+                <h3>{h.data.title}</h3>
+                <span class:list={['status', `status--${h.data.statusTone}`]}>{h.data.status}</span>
+              </div>
+              <p class="hobby__hint">{h.data.hint}</p>
+              <div>
+                <p class="label mono">Hobby specifics</p>
+                <dl class="specs">
+                  {h.data.specs.map((s) => (
+                    <div>
+                      <dt class="mono">{s.label}</dt>
+                      <dd>{s.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="failed section-pad" aria-labelledby="failed-title">
+    <div class="container">
+      <div class="failed__head">
+        <div>
+          <p class="eyebrow amber">The archive of almost</p>
+          <h2 id="failed-title" class="display failed__title">Successfully<br /><span class="outline">failed.</span></h2>
+        </div>
+        <p class="lead">
+          Unfinished projects, honestly labelled. None of them shipped, all of them taught me something the finished ones
+          did not.
+        </p>
+      </div>
+      <ul class="graves" role="list">
+        {
+          failed.map((g) => (
+            <li class="grave">
+              <span class="stamp" aria-hidden="true">Successfully failed</span>
+              <span class="mono grave__when">{g.data.when}</span>
+              <h3>{g.data.title}</h3>
+              <p class="grave__idea">{g.data.idea}</p>
+              <div class="grave__progress">
+                <div class="grave__row">
+                  <span class="label mono">Got to</span>
+                  <span class="mono amber">{g.data.progress}%</span>
+                </div>
+                <div
+                  class="grave__bar"
+                  role="progressbar"
+                  aria-label="How far it got"
+                  aria-valuenow={g.data.progress}
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                >
+                  <span style={`--pct:${g.data.progress}%`} />
+                </div>
+              </div>
+              <div class="grave__lesson">
+                <span class="label mono">What it taught me</span>
+                <p>{g.data.lesson}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="container section-pad lab-end" aria-labelledby="end-title">
+    <h2 id="end-title" class="display lab-end__title">Every side quest makes the <span class="accent">real work</span> better.</h2>
+    <div class="lab-end__actions">
+      <a class="btn" href="/#work">See the finished stuff <Icon name="arrow-right" size={18} /></a>
+      <a class="link-arrow" href="/contact/">Or start something new with me <Icon name="arrow-right" /></a>
+    </div>
+    <p class="hand lab-end__note" aria-hidden="true">This one I'll<br />finish. Promise.<br />KÅ</p>
+  </section>
+</BaseLayout>
+
+<script>
+  // Filter hobby cards
+  const root = document.querySelector<HTMLElement>('[data-filter-root]');
+  if (root) {
+    const buttons = root.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const cards = root.querySelectorAll<HTMLElement>('[data-category]');
+    const status = root.querySelector<HTMLElement>('[data-filter-status]');
+    buttons.forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const cat = btn.dataset.filter;
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        let shown = 0;
+        cards.forEach((card) => {
+          const match = cat === 'all' || card.dataset.category === cat;
+          card.hidden = !match;
+          if (match) shown++;
+        });
+        if (status) status.textContent = `Showing ${shown} side ${shown === 1 ? 'quest' : 'quests'}`;
+      }),
+    );
+  }
+
+  // Count the idea counter up once it scrolls into view
+  const counter = document.querySelector<HTMLElement>('[data-counter]');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (counter && !reduce) {
+    const numbers = counter.querySelectorAll<HTMLElement>('[data-count]');
+    numbers.forEach((n) => (n.textContent = '0'));
+    counter.classList.add('is-waiting');
+    const io = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      io.disconnect();
+      counter.classList.remove('is-waiting');
+      const t0 = performance.now();
+      const step = (now: number) => {
+        const p = Math.min(1, (now - t0) / 1600);
+        const e = 1 - Math.pow(1 - p, 3);
+        numbers.forEach((n) => (n.textContent = String(Math.round(Number(n.dataset.count) * e))));
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    });
+    io.observe(counter);
+  }
+</script>
+
+<style>
+  .amber {
+    color: var(--color-amber);
+  }
+  .label {
+    display: block;
+    margin-bottom: var(--space-2);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .section-pad {
+    padding-block: var(--space-9);
+  }
+
+  .lab-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 32.5rem;
+    gap: var(--space-8);
+    align-items: end;
+    padding-top: var(--space-9);
+  }
+  .lab-hero__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  .lab-hero__title,
+  .failed__title {
+    font-size: clamp(2.75rem, 1rem + 7vw, 6rem);
+    overflow-wrap: break-word;
+  }
+
+  .counter {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+  }
+  .counter__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+  .counter__grid div {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    gap: var(--space-2);
+  }
+  .counter__grid dt {
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .counter__grid dd {
+    font-size: 3.5rem;
+    font-weight: 800;
+    font-stretch: 80%;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .counter__bar {
+    height: 4px;
+    border-radius: 4px;
+    background: rgba(242, 193, 78, 0.25);
+    overflow: hidden;
+  }
+  .counter__bar span {
+    display: block;
+    width: var(--pct);
+    height: 100%;
+    background: var(--color-accent);
+    transition: width 1.6s var(--ease);
+  }
+  .counter.is-waiting .counter__bar span {
+    width: 0;
+  }
+  .counter__note {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+  .counter__hand {
+    position: absolute;
+    right: 1rem;
+    top: -4.5rem;
+    font-size: 1.75rem;
+    transform: rotate(-6deg);
+  }
+
+  .lab-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    margin-bottom: var(--space-6);
+  }
+  .lab-head__title {
+    font-size: clamp(2rem, 1.4rem + 2vw, 2.75rem);
+    font-stretch: 82%;
+  }
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .filter {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 2.75rem;
+    padding: 0 var(--space-5);
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-text-soft);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: all var(--dur);
+  }
+  .filter:hover {
+    border-color: var(--color-accent);
+  }
+  .filter[aria-pressed='true'] {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-accent-ink);
+  }
+  .filter__count {
+    opacity: 0.7;
+  }
+
+  .hobbies {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+  }
+  .hobby {
+    display: grid;
+    grid-template-columns: 16rem minmax(0, 1fr);
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .hobby[hidden] {
+    display: none;
+  }
+  .hobby:hover {
+    border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  }
+  .hobby__media {
+    position: relative;
+    min-height: 16rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .hobby__media img,
+  .hobby__media .placeholder {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hobby__cat {
+    position: absolute;
+    left: var(--space-4);
+    top: var(--space-4);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .hobby__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-6);
+  }
+  .hobby__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+  .hobby__top h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+  .hobby__hint {
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+  }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.75rem;
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .status--active {
+    background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+    color: var(--color-accent);
+  }
+  .status--ongoing {
+    background: rgba(155, 140, 255, 0.16);
+    color: #d6d0ff;
+  }
+  .status--new {
+    background: rgba(139, 227, 122, 0.14);
+    color: #b9f0ad;
+  }
+  .specs div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-block: 0.55rem;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.09);
+    font-size: var(--text-sm);
+  }
+  .specs div:last-child {
+    border-bottom: none;
+  }
+  .specs dt {
+    font-size: var(--text-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .specs dd {
+    text-align: right;
+  }
+
+  .failed {
+    border-top: 1px solid var(--color-line);
+  }
+  .failed__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-6);
+    margin-bottom: var(--space-7);
+  }
+  .failed__head .eyebrow {
+    margin-bottom: var(--space-4);
+  }
+  .outline {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--color-amber);
+  }
+  .graves {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+  }
+  .grave {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    background: var(--color-surface-2);
+    border: 1px dashed rgba(255, 255, 255, 0.16);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .grave h3 {
+    padding-right: 9rem;
+    font-size: 1.625rem;
+    font-weight: 700;
+    line-height: 1.15;
+  }
+  .grave__when {
+    padding-right: 9rem;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #7d8793;
+  }
+  .grave__idea {
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+  }
+  .grave__row {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--text-xs);
+  }
+  .grave__bar {
+    height: 4px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+  .grave__bar span {
+    display: block;
+    width: var(--pct);
+    height: 100%;
+    background: var(--color-amber);
+  }
+  .grave__lesson {
+    padding-top: var(--space-4);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  .stamp {
+    position: absolute;
+    right: 1.1rem;
+    top: 1.6rem;
+    padding: 0.5rem 0.75rem;
+    border: 2px solid var(--color-amber);
+    border-radius: 6px;
+    color: var(--color-amber);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    transform: rotate(-9deg);
+    opacity: 0.92;
+  }
+
+  .lab-end {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    border-top: 1px solid var(--color-line);
+  }
+  .lab-end__title {
+    max-width: 62rem;
+    font-size: var(--text-3xl);
+    font-stretch: 80%;
+    line-height: 0.92;
+  }
+  .lab-end__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-5) var(--space-6);
+  }
+  .lab-end__note {
+    position: absolute;
+    right: var(--gutter);
+    top: 7rem;
+    font-size: 1.875rem;
+    text-align: right;
+    transform: rotate(-8deg);
+  }
+
+  @media (max-width: 1200px) {
+    .hobbies {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .graves {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 1000px) {
+    .lab-hero {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .counter__hand {
+      display: none;
+    }
+    .lab-end__note {
+      position: static;
+      align-self: flex-end;
+    }
+  }
+  @media (max-width: 700px) {
+    .hobby {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .hobby__media {
+      min-height: 12rem;
+      border-right: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .graves {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .counter__grid dd {
+      font-size: 2.5rem;
+    }
+  }
+</style>

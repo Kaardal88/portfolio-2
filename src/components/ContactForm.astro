@@ -1,0 +1,258 @@
+---
+/**
+ * Contact form powered by Web3Forms (https://web3forms.com), so no server is needed.
+ * Put your access key in .env as PUBLIC_WEB3FORMS_KEY (see .env.example).
+ * The form works without JavaScript; with JavaScript it validates inline and
+ * sends in the background.
+ */
+import Icon from './Icon.astro';
+const accessKey = import.meta.env.PUBLIC_WEB3FORMS_KEY ?? '';
+---
+
+<form class="form" action="https://api.web3forms.com/submit" method="POST" novalidate data-contact-form>
+  <input type="hidden" name="access_key" value={accessKey} />
+  <input type="hidden" name="subject" value="New message from the portfolio" />
+  <input type="hidden" name="from_name" value="Portfolio contact form" />
+  <!-- Honeypot: humans never see this, bots fill it in -->
+  <input type="checkbox" name="botcheck" class="visually-hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+  <div class="field">
+    <label for="name">Name</label>
+    <input id="name" name="name" type="text" autocomplete="name" required minlength="2" aria-describedby="name-error" />
+    <p class="field__error" id="name-error" data-error-for="name"></p>
+  </div>
+
+  <div class="field">
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" autocomplete="email" required aria-describedby="email-error" />
+    <p class="field__error" id="email-error" data-error-for="email"></p>
+  </div>
+
+  <fieldset class="field field--full">
+    <legend>What is it about?</legend>
+    <div class="topics">
+      <label class="topic"><input type="radio" name="topic" value="Freelance project" checked /><span>Freelance project</span></label>
+      <label class="topic"><input type="radio" name="topic" value="Job opportunity" /><span>Job opportunity</span></label>
+      <label class="topic"><input type="radio" name="topic" value="Just saying hi" /><span>Just saying hi</span></label>
+    </div>
+  </fieldset>
+
+  <div class="field field--full">
+    <label for="message">Message</label>
+    <textarea id="message" name="message" rows="6" required minlength="10" aria-describedby="message-error message-hint"></textarea>
+    <p class="field__hint" id="message-hint">What are you building, and where is it stuck?</p>
+    <p class="field__error" id="message-error" data-error-for="message"></p>
+  </div>
+
+  <div class="form__footer field--full">
+    <button type="submit" class="btn" data-submit>
+      <span data-submit-label>Send message</span>
+      <Icon name="arrow-right" size={18} />
+    </button>
+    <p class="form__status mono" role="status" aria-live="polite" data-status></p>
+  </div>
+</form>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+
+  const messages: Record<string, (el: HTMLInputElement | HTMLTextAreaElement) => string> = {
+    name: (el) => (el.validity.valueMissing ? 'Tell me your name.' : 'That name looks a bit short.'),
+    email: (el) => (el.validity.valueMissing ? 'I need an email to reply to.' : 'That email does not look quite right.'),
+    message: (el) => (el.validity.valueMissing ? 'Write a few words about your idea.' : 'A little more detail, please (10+ characters).'),
+  };
+
+  const validateField = (el: HTMLInputElement | HTMLTextAreaElement) => {
+    const out = form?.querySelector<HTMLElement>(`[data-error-for="${el.name}"]`);
+    const ok = el.checkValidity();
+    el.setAttribute('aria-invalid', String(!ok));
+    if (out) out.textContent = ok ? '' : messages[el.name]?.(el) ?? 'Please check this field.';
+    return ok;
+  };
+
+  if (form) {
+    const fields = [...form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('#name, #email, #message')];
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+    const label = form.querySelector<HTMLElement>('[data-submit-label]')!;
+
+    fields.forEach((el) =>
+      el.addEventListener('blur', () => {
+        if (el.value) validateField(el);
+      }),
+    );
+    fields.forEach((el) =>
+      el.addEventListener('input', () => {
+        if (el.getAttribute('aria-invalid') === 'true') validateField(el);
+      }),
+    );
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const results = fields.map(validateField);
+      const firstInvalid = fields[results.indexOf(false)];
+      if (firstInvalid) {
+        firstInvalid.focus();
+        status.textContent = '';
+        return;
+      }
+
+      submit.disabled = true;
+      label.textContent = 'Sending…';
+      status.dataset.state = '';
+      status.textContent = 'Transmitting thoughts…';
+
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { Accept: 'application/json' },
+          body: new FormData(form),
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || json.success === false) throw new Error(json.message || 'Request failed');
+        form.reset();
+        status.dataset.state = 'ok';
+        status.textContent = 'Message received. Brain activity increased. I will reply soon.';
+      } catch {
+        status.dataset.state = 'error';
+        status.textContent = 'That successfully failed. Try again, or email me directly.';
+      } finally {
+        submit.disabled = false;
+        label.textContent = 'Send message';
+      }
+    });
+  }
+</script>
+
+<style>
+  .form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .field--full {
+    grid-column: 1 / -1;
+  }
+  label,
+  legend {
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-soft);
+  }
+  legend {
+    margin-bottom: var(--space-2);
+  }
+  input:not([type='radio'], [type='checkbox'], [type='hidden']),
+  textarea {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font: inherit;
+    transition:
+      border-color var(--dur),
+      box-shadow var(--dur);
+  }
+  textarea {
+    resize: vertical;
+  }
+  input:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 25%, transparent);
+  }
+  [aria-invalid='true'] {
+    border-color: #ff8a80 !important;
+  }
+  .field__hint {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  .field__error {
+    min-height: 1.25rem;
+    font-size: var(--text-sm);
+    color: #ff9b91;
+  }
+
+  .topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .topic {
+    position: relative;
+    letter-spacing: 0.06em;
+    text-transform: none;
+    font-size: 0.8125rem;
+  }
+  .topic input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    cursor: pointer;
+  }
+  .topic span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 var(--space-5);
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    transition: all var(--dur);
+  }
+  .topic input:checked + span {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-accent-ink);
+  }
+  .topic input:focus-visible + span {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  .form__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-5);
+  }
+  .form__footer .btn[disabled] {
+    opacity: 0.6;
+    cursor: progress;
+  }
+  .form__status {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  .form__status[data-state='ok'] {
+    color: var(--color-accent);
+  }
+  .form__status[data-state='error'] {
+    color: var(--color-amber);
+  }
+
+  @media (max-width: 700px) {
+    .form {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .form__footer .btn {
+      width: 100%;
+    }
+  }
+</style>

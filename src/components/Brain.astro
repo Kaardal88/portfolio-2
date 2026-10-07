@@ -1,0 +1,289 @@
+---
+import { getCollection } from 'astro:content';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+
+// Background thoughts: not links, just personality.
+const faint = [
+  { name: 'Game ideas', sub: 'Play. Maybe ship.', x: 0.95, y: 0.3, side: 'left' },
+  { name: 'AI workflows', sub: 'Less manual', x: 0.05, y: 0.56, side: 'right' },
+  { name: 'Music', sub: 'Different frequency', x: 0.2, y: 0.88, side: 'right' },
+  { name: 'UX', sub: 'Human-first', x: 0.56, y: 0.93, side: 'right' },
+  { name: 'Woodturning', sub: 'Real materials', x: 0.97, y: 0.86, side: 'left' },
+];
+
+const hint = 'Hover a bright star to slow the thoughts down.';
+---
+
+<div class="brain" data-brain>
+  <div class="brain__stage">
+    <canvas aria-hidden="true"></canvas>
+
+    {
+      faint.map((f) => (
+        <span class:list={['brain__faint', `side-${f.side}`]} style={`--x:${f.x};--y:${f.y}`} aria-hidden="true">
+          <span class="brain__fdot" />
+          <span>
+            <span class="brain__fname">{f.name}</span>
+            <span class="brain__fsub mono">{f.sub}</span>
+          </span>
+        </span>
+      ))
+    }
+
+    <ul class="brain__nodes" aria-label="Selected projects">
+      {
+        projects.map((p) => (
+          <li>
+            <a
+              href={`/work/${p.id}/`}
+              class:list={['brain__node', `side-${p.data.brain.side}`]}
+              style={`--x:${p.data.brain.x};--y:${p.data.brain.y};--mx:${p.data.brain.mobileX};--my:${p.data.brain.mobileY}`}
+              data-brain-node
+              data-id={p.id}
+              data-name={p.data.title}
+              data-x={p.data.brain.x}
+              data-y={p.data.brain.y}
+              data-mx={p.data.brain.mobileX}
+              data-my={p.data.brain.mobileY}
+            >
+              <span class="brain__ring" aria-hidden="true" />
+              <span class="brain__text">
+                <span class="brain__name">{p.data.title}</span>
+                <span class="brain__sub mono">{p.data.brain.label}</span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="brain__strip">
+    <div class="brain__loader" aria-hidden="true">
+      <span class="mono">Compiling questionable decisions…</span>
+      <span class="brain__bar"><span></span></span>
+      <span class="mono">73%</span>
+    </div>
+    <div class="brain__status" data-brain-status data-hint={hint} data-hint-touch="Tap a star to focus. Tap again to open." aria-live="polite">
+      <span class="mono brain__hint">{hint}</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { Brain } from '../scripts/brain';
+  document.querySelectorAll<HTMLElement>('[data-brain]').forEach((el) => new Brain(el));
+</script>
+
+<style>
+  .brain {
+    container-type: inline-size;
+    position: relative;
+    width: 100%;
+  }
+  .brain__stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 712 / 620;
+  }
+  canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .brain__nodes {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Project nodes */
+  .brain__node {
+    position: absolute;
+    left: calc(var(--x) * 100%);
+    top: calc(var(--y) * 100%);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    min-height: 2.75rem;
+    white-space: nowrap;
+    transform: translate(-11px, -11px);
+    transition: opacity 0.5s ease;
+  }
+  .brain__node.side-left {
+    flex-direction: row-reverse;
+    text-align: right;
+    transform: translate(calc(-100% + 11px), -11px);
+  }
+  .brain__ring {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border: 1.5px solid var(--color-accent);
+    border-radius: 50%;
+    background: var(--color-bg);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--color-accent) 45%, transparent);
+    transition:
+      box-shadow 0.4s,
+      transform 0.4s;
+  }
+  .brain__ring::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+  .brain__text {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding-top: 1px;
+  }
+  .brain__name {
+    font-size: 1.1875rem;
+    font-weight: 600;
+    transition: color 0.3s;
+  }
+  .brain__sub {
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .brain__node:global(.is-on) .brain__ring {
+    transform: scale(1.25);
+    box-shadow:
+      0 0 0 6px color-mix(in srgb, var(--color-accent) 18%, transparent),
+      0 0 30px var(--color-accent);
+  }
+  .brain__node:global(.is-on) .brain__name {
+    color: var(--color-accent);
+  }
+  .brain:global(.is-focused) .brain__node:not(:global(.is-on)) {
+    opacity: 0.3;
+  }
+
+  /* Background thoughts */
+  .brain__faint {
+    position: absolute;
+    left: calc(var(--x) * 100%);
+    top: calc(var(--y) * 100%);
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0.6;
+    transform: translate(-5px, -5px);
+    transition: opacity 0.5s;
+  }
+  .brain__faint.side-left {
+    flex-direction: row-reverse;
+    text-align: right;
+    transform: translate(calc(-100% + 5px), -5px);
+  }
+  .brain:global(.is-focused) .brain__faint {
+    opacity: 0.14;
+  }
+  .brain__fdot {
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--color-violet);
+    border-radius: 50%;
+  }
+  .brain__fname {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--color-text-soft);
+  }
+  .brain__fsub {
+    display: block;
+    margin-top: 3px;
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8a94a0;
+  }
+
+  /* Strip under the brain */
+  .brain__strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    min-height: 5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  .brain__loader {
+    flex-shrink: 0;
+    display: flex;
+    white-space: nowrap;
+    transition: opacity 0.3s;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+  .brain__bar {
+    width: 8.75rem;
+    height: 3px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+  }
+  .brain__bar span {
+    display: block;
+    width: 73%;
+    height: 100%;
+    background: var(--color-accent);
+  }
+  .brain:global(.is-focused) .brain__loader {
+    opacity: 0;
+  }
+  .brain__status {
+    display: flex;
+    white-space: nowrap;
+    align-items: center;
+    gap: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+  .brain__status :global(.brain__hint) {
+    white-space: normal;
+    text-align: right;
+  }
+  .brain__status :global(.brain__status-label) {
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .brain__status :global(.link-arrow) {
+    font-size: 0.9375rem;
+  }
+
+  /* Compact brain (phones): matches the JS breakpoint of 560px */
+  @container (max-width: 559px) {
+    .brain__stage {
+      aspect-ratio: 390 / 380;
+    }
+    .brain__node {
+      left: calc(var(--mx) * 100%);
+      top: calc(var(--my) * 100%);
+    }
+    .brain__name {
+      font-size: var(--text-base);
+    }
+    .brain__sub {
+      font-size: 0.625rem;
+    }
+    .brain__faint,
+    .brain__loader {
+      display: none;
+    }
+  }
+</style>

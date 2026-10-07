@@ -1,0 +1,64 @@
+/*
+ * Design tokens: the single source for the style guide.
+ * Colour, type and spacing values here should match the style guide document.
+ */
+:root {
+  /* Colour: surfaces */
+  --color-bg: #07090d;
+  --color-surface: #0d1117;
+  --color-surface-2: #0b0e13;
+  --color-placeholder: #10151c;
+  --color-line: rgba(255, 255, 255, 0.08);
+  --color-line-strong: rgba(255, 255, 255, 0.18);
+
+  /* Colour: text (all pass WCAG AA on --color-bg) */
+  --color-text: #eef1f4;
+  --color-text-soft: #c9d0d7;
+  --color-text-body: #b5bec8;
+  --color-text-muted: #9aa4b0;
+
+  /* Colour: accents */
+  --color-accent: #5ee6d0; /* thoughts, focus, primary actions */
+  --color-accent-ink: #04110f; /* text on accent */
+  --color-violet: #9b8cff; /* secondary thoughts, badges */
+  --color-green: #8be37a; /* "new" states */
+  --color-amber: #f2c14e; /* "successfully failed" only */
+
+  /* Type */
+  --font-display: 'Archivo', system-ui, sans-serif;
+  --font-body: 'Archivo', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-hand: 'Caveat', cursive;
+  --font-name: 'Marcellus', Georgia, serif; /* hero name next to the carved K */
+
+  --text-xs: 0.75rem; /* 12 */
+  --text-sm: 0.875rem; /* 14 */
+  --text-base: 1rem; /* 16 */
+  --text-lg: 1.125rem; /* 18 */
+  --text-xl: 1.5rem; /* 24 */
+  --text-2xl: clamp(1.75rem, 1.2rem + 1.8vw, 2.25rem); /* 28–36 */
+  --text-3xl: clamp(2.5rem, 1.5rem + 3.5vw, 4.5rem); /* 40–72 */
+  --text-hero: clamp(3.5rem, 1.6rem + 6.5vw, 7rem); /* 56–112 */
+
+  /* Space */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --space-9: 7.5rem;
+
+  --gutter: clamp(1rem, 0.4rem + 3.5vw, 4.5rem);
+  --max-width: 110rem; /* 1760px: uses the width of large screens */
+
+  /* Shape and motion */
+  --radius-sm: 0.75rem;
+  --radius-md: 1.25rem;
+  --radius-lg: 1.75rem;
+  --radius-pill: 999px;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur: 0.25s;
+}

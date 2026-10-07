@@ -1,0 +1,330 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Brain from '../components/Brain.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../site.config';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const orbit = ['Game ideas', 'AI workflows', 'Music', 'Woodturning', 'Art'];
+---
+
+<BaseLayout>
+  <section class="hero container" aria-labelledby="hero-title">
+    <div class="hero__text">
+      <p class="eyebrow">{site.role}</p>
+      <div class="hero-name-wrap">
+      <h1 id="hero-title" class="hero-name">
+        <span class="visually-hidden">{site.name}</span>
+        <img class="hero-name__k" src="/images/K.webp" width="480" height="460" alt="" aria-hidden="true" />
+        <span class="hero-name__rest" aria-hidden="true">{site.name.slice(1)}</span>
+      </h1>
+      </div>
+      <p class="hero__tagline">Ideas in <em class="accent"> constant motion.</em></p>
+      <p class="lead">
+        I turn ideas into things people can use: web apps, interfaces and small tools that feel alive without getting
+        in the way. Always building, always a few steps ahead (and ten new ideas behind).
+      </p>
+      <div class="hero__actions">
+        <a class="btn" href="#work">See selected work <Icon name="arrow-right" size={18} /></a>
+
+      </div>
+
+    </div>
+    <div class="hero__brain">
+      <Brain />
+    </div>
+  </section>
+
+  <section id="work" class="section section--line" aria-labelledby="work-title">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">01 / Selected work</p>
+          <h2 id="work-title" class="display section-head__title">Three projects.<br />One restless brain.</h2>
+        </div>
+        <p class="lead">Each case covers what I built and what I went back and improved.</p>
+      </div>
+      <ul class="grid-3" role="list">
+        {
+          projects.map((project, index) => (
+            <li>
+              <ProjectCard project={project} index={index} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="container orbit-wrap" aria-labelledby="orbit-title">
+    <div class="orbit">
+      <div>
+        <p class="eyebrow">02 / In orbit</p>
+        <h2 id="orbit-title" class="orbit__title">Side quests that keep the brain warm.</h2>
+      </div>
+      <ul class="orbit__chips" role="list">
+        {orbit.map((o) => <li class="chip">{o}</li>)}
+      </ul>
+      <a class="link-arrow" href="/lab/">Visit the lab <Icon name="arrow-right" /></a>
+    </div>
+  </section>
+
+  <section class="section section--line cta" aria-labelledby="cta-title">
+    <div class="container cta__inner">
+      <p class="eyebrow">03 / Contact</p>
+      <h2 id="cta-title" class="display cta__title">Got an idea that<br />needs to <span class="accent">move?</span></h2>
+      <p class="lead">
+        I take on freelance front-end work: websites, web apps and interfaces. Tell me what you are building and where it
+        is stuck.
+      </p>
+      <div class="cta__actions">
+        <a class="btn" href="/contact/">Start a conversation <Icon name="arrow-right" size={18} /></a>
+        <a class="mono cta__email" href={`mailto:${site.email}`}>{site.email}</a>
+      </div>
+      <p class="hand cta__note" aria-hidden="true">Still curious.<br />Still building.<br />KÅ</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+
+  .hero {
+    position: relative;
+    display: grid;
+
+    grid-template-columns: minmax(0, 50rem) minmax(24rem, 1fr);
+    gap: var(--space-5);
+    align-items: center;
+    min-height: calc(100svh - 5.5rem);
+    padding-block: var(--space-7);
+  }
+  .hero__text {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .hero-name-wrap {
+    container-type: inline-size;
+  }
+
+
+  .hero-name {
+    display: flex;
+    align-items: flex-end;
+    font-family: var(--font-name);
+    font-size: min(9cqi, 4.5rem);
+    font-weight: 400;
+    line-height: 1;
+    white-space: nowrap;
+
+  }
+  .hero-name__k {
+    flex: none;
+    height: 3em;
+    width: auto;
+    filter: drop-shadow(0 0.15em 0.4em rgba(94, 230, 208, 0.18));
+  }
+  .hero-name__rest {
+    margin-left: -0.12em;
+    margin-bottom: -0.1em;
+    letter-spacing: 0.02em;
+    color: #cf9d6e ;
+  }
+  .hero__title {
+    font-size: var(--text-hero);
+  }
+  .hero__title span {
+    display: block;
+  }
+  .hero__tagline {
+    font-size: clamp(1.25rem, 1.3rem + 2.2vw, 3rem);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .hero__tagline em {
+    font-weight: 300;
+  }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-5) var(--space-6);
+    margin-top: var(--space-2);
+  }
+  .play {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 3.25rem;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .play__ring {
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 50%;
+    transition: border-color var(--dur);
+  }
+  .play:hover .play__ring {
+    border-color: var(--color-accent);
+  }
+  .play__time {
+    font-weight: 400;
+    color: var(--color-text-muted);
+    letter-spacing: 0;
+  }
+  .hero__note {
+    position: absolute;
+    right: -2rem;
+    bottom: -5.5rem;
+    font-size: 1.75rem;
+    transform: rotate(-7deg);
+  }
+  .hero__brain {
+    width: 100%;
+    max-width: 44.5rem;
+    justify-self: end;
+  }
+
+  .section-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-5) var(--space-7);
+    margin-bottom: var(--space-7);
+  }
+  .section-head .eyebrow {
+    margin-bottom: var(--space-4);
+  }
+  .section-head__title {
+    font-size: var(--text-3xl);
+    font-stretch: 82%;
+    line-height: 0.92;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .grid-3 > li {
+    display: flex;
+  }
+  .grid-3 > li > :global(*) {
+    flex: 1;
+  }
+
+  .orbit-wrap {
+    padding-bottom: var(--space-9);
+  }
+  .orbit {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding: var(--space-7);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+  }
+  .orbit .eyebrow {
+    margin-bottom: var(--space-3);
+  }
+  .orbit__title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+  .orbit__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cta__inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  .cta__title {
+    font-size: var(--text-hero);
+  }
+  .cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-5) var(--space-6);
+  }
+  .cta__email {
+    padding: var(--space-3) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-soft);
+  }
+  .cta__email:hover {
+    color: var(--color-accent);
+  }
+  .cta__note {
+    position: absolute;
+    right: var(--gutter);
+    top: 6rem;
+    font-size: 1.875rem;
+    text-align: right;
+    transform: rotate(-8deg);
+  }
+
+  @media (max-width: 1100px) {
+    .grid-3 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 960px) {
+    .hero {
+      grid-template-columns: minmax(0, 1fr);
+      min-height: 0;
+      padding-top: var(--space-7);
+    }
+    .hero__note {
+      display: none;
+    }
+    .hero__brain {
+      justify-self: stretch;
+      max-width: none;
+    }
+    .cta__note {
+      position: static;
+      align-self: flex-end;
+      font-size: 1.625rem;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .grid-3 {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .orbit {
+      padding: var(--space-6) var(--space-5);
+    }
+    .hero__actions .btn {
+      width: 100%;
+    }
+  }
+</style>

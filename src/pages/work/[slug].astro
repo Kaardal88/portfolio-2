@@ -1,0 +1,666 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return projects.map((project, i) => ({
+    params: { slug: project.id },
+    props: {
+      project,
+      index: i,
+      prev: projects[(i - 1 + projects.length) % projects.length],
+      next: projects[(i + 1) % projects.length],
+    },
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  index: number;
+  prev: CollectionEntry<'projects'>;
+  next: CollectionEntry<'projects'>;
+}
+
+const { project, index, prev, next } = Astro.props;
+const d = project.data;
+const { Content } = await render(project);
+const num = String(index + 1).padStart(2, '0');
+const nextNum = String(next.data.order).padStart(2, '0');
+---
+
+<BaseLayout title={d.title} description={d.summary} image={d.cover}>
+  <div class="container crumbs">
+    <nav aria-label="Breadcrumb" class="mono">
+      <ol>
+        <li><a href="/#work">Work</a></li>
+        <li aria-current="page">{d.title}</li>
+      </ol>
+    </nav>
+    <nav aria-label="More projects" class="mono crumbs__pager">
+      <a href={`/work/${prev.id}/`}>← {prev.data.title}</a>
+      <a href={`/work/${next.id}/`}>{next.data.title} →</a>
+    </nav>
+  </div>
+
+  <article>
+    <header class="container intro">
+      <p class="eyebrow">{num} / {d.category}</p>
+      <h1 class="display intro__title">{d.title}</h1>
+      <div class="intro__row">
+        <p class="intro__summary">{d.summary}</p>
+        <div class="intro__actions">
+          {d.liveUrl && <a class="btn" href={d.liveUrl}>View live site <Icon name="arrow-up-right" /></a>}
+          {d.repoUrl && <a class="btn btn--ghost" href={d.repoUrl}><Icon name="code" /> Repository</a>}
+        </div>
+      </div>
+      <dl class="facts">
+        <div><dt class="mono">Role</dt><dd>{d.role}</dd></div>
+        <div><dt class="mono">Year</dt><dd>{d.year}</dd></div>
+        <div><dt class="mono">Stack</dt><dd>{d.stack.join(', ')}</dd></div>
+        {d.client && <div><dt class="mono">Client</dt><dd>{d.client}</dd></div>}
+      </dl>
+    </header>
+
+    <div class="container hero-shot">
+      {
+        d.cover ? (
+          <img src={d.cover} alt={d.coverAlt ?? ''} />
+        ) : (
+          <div class="placeholder hero-shot__ph">[Hero screenshot: {d.title}]</div>
+        )
+      }
+    </div>
+
+    <section class="container block" aria-labelledby="brief">
+      <div class="block__label">
+        <p class="eyebrow">01 / The brief</p>
+        <h2 id="brief" class="block__title">What needed solving</h2>
+      </div>
+      <div class="prose"><Content /></div>
+    </section>
+
+    {
+      d.features.length > 0 && (
+        <section class="container block" aria-labelledby="built">
+          <div class="block__label">
+            <p class="eyebrow">02 / What I built</p>
+            <h2 id="built" class="block__title">The main pieces</h2>
+          </div>
+          <ul class="features" role="list">
+            {d.features.map((f) => (
+              <li class="feature">
+                <span class="feature__icon"><Icon name={f.icon} size={20} /></span>
+                <h3>{f.title}</h3>
+                <p>{f.text}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      d.decisions.length > 0 && (
+        <section class="container block" aria-labelledby="decisions">
+          <div class="block__label">
+            <p class="eyebrow">03 / Decisions</p>
+            <h2 id="decisions" class="block__title">Choices, and why</h2>
+          </div>
+          <ol class="decisions" role="list">
+            {d.decisions.map((dec, i) => (
+              <li class="decision">
+                <span class="mono accent">{String(i + 1).padStart(2, '0')}</span>
+                <div>
+                  <span class="label mono">I chose</span>
+                  <p class="decision__choice">{dec.choice}</p>
+                </div>
+                <div>
+                  <span class="label mono">Because</span>
+                  <p>{dec.why}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )
+    }
+
+
+
+    <section class="container block" aria-labelledby="reflection">
+      <div class="block__label">
+        <p class="eyebrow">05 / Reflection</p>
+        <h2 id="reflection" class="block__title">What I took with me</h2>
+      </div>
+      <div class="reflect">
+        <div class="feature"><span class="label mono">What I learned</span><p>{d.reflection.learned}</p></div>
+        <div class="feature feature--failed">
+          <span class="label mono">Successfully failed along the way</span><p>{d.reflection.failed}</p>
+        </div>
+        <div class="feature reflect__wide"><span class="label mono">If I had another week</span><p>{d.reflection.next}</p></div>
+      </div>
+    </section>
+  </article>
+
+  <div class="container next-wrap">
+    <p class="hand next__note" aria-hidden="true">keep drifting →</p>
+    <a class="next" href={`/work/${next.id}/`}>
+      <span class="next__text">
+        <span class="eyebrow">Next thought / {nextNum}</span>
+        <span class="display next__title">{next.data.title}</span>
+        <span class="next__summary">{next.data.shortSummary}</span>
+      </span>
+      <span class="next__arrow" aria-hidden="true"><Icon name="arrow-right" size={32} /></span>
+    </a>
+  </div>
+</BaseLayout>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-compare]').forEach((root) => {
+    const tabs = root.querySelectorAll<HTMLButtonElement>('[data-show]');
+    const panels = root.querySelectorAll<HTMLElement>('[data-panel]');
+    tabs.forEach((tab) =>
+      tab.addEventListener('click', () => {
+        tabs.forEach((t) => t.setAttribute('aria-pressed', String(t === tab)));
+        panels.forEach((p) => (p.hidden = p.dataset.panel !== tab.dataset.show));
+      }),
+    );
+  });
+</script>
+
+<style>
+  .crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding-top: var(--space-5);
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+  .crumbs ol {
+    display: flex;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .crumbs li {
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+  .crumbs li + li::before {
+    content: '/';
+    margin-right: var(--space-3);
+  }
+  .crumbs li[aria-current] {
+    color: var(--color-text);
+  }
+  .crumbs a {
+    display: inline-block;
+    padding: var(--space-3) 0;
+  }
+  .crumbs a:hover {
+    color: var(--color-accent);
+  }
+  .crumbs__pager {
+    display: flex;
+    gap: var(--space-5);
+  }
+
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-7);
+  }
+  .intro__title {
+    font-size: clamp(3.5rem, 1rem + 10vw, 10.5rem);
+    font-stretch: 76%;
+    line-height: 0.86;
+    overflow-wrap: anywhere;
+  }
+  .intro__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-6);
+  }
+  .intro__summary {
+    max-width: 45rem;
+    font-size: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+    line-height: 1.5;
+    color: var(--color-text-soft);
+  }
+  .intro__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+  .intro__actions .btn--ghost {
+    min-height: 3.25rem;
+  }
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: var(--space-5);
+    margin-top: var(--space-3);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-line);
+  }
+  .facts div {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .facts dt {
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .facts dd {
+    font-size: 1.0625rem;
+  }
+
+  .hero-shot {
+    padding-bottom: var(--space-9);
+  }
+  .hero-shot img,
+  .hero-shot__ph {
+    width: 100%;
+    aspect-ratio: 16 / 8.5;
+    object-fit: cover;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+  }
+
+  .block {
+    display: grid;
+    grid-template-columns: 20rem minmax(0, 1fr);
+    gap: var(--space-8);
+    padding-bottom: var(--space-9);
+  }
+  .block__label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .block__title {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  .prose {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    max-width: 48rem;
+    font-size: var(--text-lg);
+    line-height: 1.7;
+    color: var(--color-text-body);
+  }
+  .prose :global(p) {
+    margin: 0;
+  }
+  .prose :global(a) {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .label {
+    display: block;
+    margin-bottom: var(--space-2);
+    font-size: 0.6875rem;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+  }
+  .feature {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+  }
+  .feature h3 {
+    font-size: 1.375rem;
+    font-weight: 600;
+  }
+  .feature p {
+    color: var(--color-text-muted);
+  }
+  .feature__icon {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+    color: var(--color-accent);
+  }
+  .feature--failed {
+    border-style: dashed;
+    border-color: rgba(242, 193, 78, 0.4);
+  }
+  .feature--failed .label {
+    color: var(--color-amber);
+  }
+
+  .decisions {
+    margin: 0;
+    padding: 0;
+  }
+  .decision {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-6);
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-line);
+  }
+  .decision__choice {
+    font-size: 1.1875rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .decision p:not(.decision__choice) {
+    color: var(--color-text-body);
+  }
+
+  .improve {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+    margin-bottom: var(--space-9);
+    padding: clamp(1.5rem, 0.5rem + 4vw, 4rem);
+    background: var(--color-surface-2);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+    border-radius: var(--radius-lg);
+  }
+  .improve__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-5);
+  }
+  .improve__head .eyebrow {
+    margin-bottom: var(--space-4);
+  }
+  .improve__title {
+    font-size: var(--text-3xl);
+    font-stretch: 80%;
+    line-height: 0.92;
+  }
+  .improve__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+  }
+  .improve__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 24rem;
+    gap: var(--space-7);
+    align-items: start;
+  }
+  .compare {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .compare__tabs {
+    display: flex;
+    gap: var(--space-2);
+  }
+  .compare__tab {
+    min-height: 2.75rem;
+    padding: 0 var(--space-5);
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-text-soft);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all var(--dur);
+  }
+  .compare__tab:hover {
+    border-color: var(--color-accent);
+  }
+  .compare__tab[aria-pressed='true'] {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-accent-ink);
+  }
+  .compare__figure[hidden] {
+    display: none;
+  }
+  .compare__figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .compare__figure img,
+  .compare__ph {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+  }
+  .compare__figure[data-panel='after'] img,
+  .compare__figure[data-panel='after'] .compare__ph {
+    border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  }
+  .compare__figure figcaption {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+  .improve__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  .improve__text p {
+    color: var(--color-text-body);
+  }
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-line);
+  }
+  .metrics div {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    gap: var(--space-1);
+  }
+  .metrics__value {
+    font-size: 2rem;
+    font-weight: 800;
+    font-stretch: 80%;
+    line-height: 1.1;
+  }
+
+  .commits__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+  .commits__head .label {
+    margin: 0;
+  }
+  .commits__list {
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .commit {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr) 7.5rem auto;
+    gap: var(--space-5);
+    align-items: center;
+    padding: var(--space-3) var(--space-5);
+    border-bottom: 1px solid var(--color-line);
+    transition: background var(--dur);
+  }
+  .commit:last-child {
+    border-bottom: none;
+  }
+  .commit:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .commit code {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+  .commit__date {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+  .commit__link {
+    font-size: var(--text-sm);
+    justify-self: end;
+  }
+
+  .reflect {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+  .reflect .feature p {
+    color: var(--color-text-body);
+  }
+  .reflect__wide {
+    grid-column: 1 / -1;
+  }
+
+  .next-wrap {
+    position: relative;
+    padding-bottom: var(--space-8);
+  }
+  .next__note {
+    position: absolute;
+    right: 12rem;
+    top: -2.25rem;
+    font-size: 1.625rem;
+    transform: rotate(-6deg);
+  }
+  .next {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-6);
+    padding: clamp(1.5rem, 0.5rem + 3vw, 3rem);
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+    transition: border-color 0.3s;
+  }
+  .next:hover {
+    border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  }
+  .next__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .next__title {
+    font-size: clamp(3rem, 1rem + 6vw, 6.5rem);
+  }
+  .next__summary {
+    max-width: 40rem;
+    color: var(--color-text-muted);
+  }
+  .next__arrow {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 5.5rem;
+    height: 5.5rem;
+    border-radius: 50%;
+    background: var(--color-accent);
+    color: var(--color-accent-ink);
+    transition: transform 0.3s var(--ease);
+  }
+  .next:hover .next__arrow {
+    transform: translateX(8px);
+  }
+
+  @media (max-width: 1100px) {
+    .block {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-6);
+    }
+    .improve__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 700px) {
+    .crumbs__pager {
+      display: none;
+    }
+    .features,
+    .reflect {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .decision {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-3);
+    }
+    .commit {
+      grid-template-columns: 1fr auto;
+      gap: var(--space-2) var(--space-4);
+    }
+    .commit__msg {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+    .commit__link {
+      grid-row: 1;
+      grid-column: 2;
+    }
+    .commit__date {
+      display: none;
+    }
+    .next {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .next__arrow {
+      width: 3.5rem;
+      height: 3.5rem;
+    }
+    .next__note {
+      display: none;
+    }
+  }
+</style>

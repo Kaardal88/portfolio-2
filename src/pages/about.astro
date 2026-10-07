@@ -1,0 +1,140 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../site.config';
+
+const principles = [
+  { title: 'Human-first', text: '[What this means in your work, one or two sentences.]' },
+  { title: 'Ship, then improve', text: '[How you work in iterations, and why.]' },
+  { title: 'Curiosity is a skill', text: '[How side quests feed back into client work.]' },
+];
+const skills = ['[HTML]', '[CSS]', '[JavaScript]', '[TypeScript]', '[React]', '[Astro]', '[Figma]', '[Git]'];
+---
+
+<BaseLayout title="About" description="Who Kim-André Kårdal is, how he works and what he is good at.">
+  <section class="container about">
+    <div class="about__photo">
+      <div class="placeholder about__ph">[Portrait photo]</div>
+    </div>
+    <div class="about__text">
+      <p class="eyebrow">About</p>
+      <h1 class="display about__title">Same brain.<br /><span class="accent">More ideas.</span></h1>
+      <p class="about__lead">
+        [Two or three sentences in your own voice: who you are, where you are based and what kind of work you want more
+        of.]
+      </p>
+      <p class="about__body">
+        [A short paragraph about your path into development, what you are studying, and what you bring from music, art
+        and making things with your hands.]
+      </p>
+      <div class="about__actions">
+        <a class="btn" href="/contact/">Work with me <Icon name="arrow-right" size={18} /></a>
+        <a class="link-arrow" href={site.introVideoUrl}>Watch the intro <Icon name="arrow-right" /></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--line">
+    <div class="container">
+      <p class="eyebrow">How I work</p>
+      <ul class="principles" role="list">
+        {
+          principles.map((p, i) => (
+            <li class="principle">
+              <span class="mono accent">{String(i + 1).padStart(2, '0')}</span>
+              <h2>{p.title}</h2>
+              <p>{p.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="eyebrow skills__label">Tools I reach for</p>
+      <ul class="skills" role="list">
+        {skills.map((s) => <li class="chip">{s}</li>)}
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .about {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: var(--space-8);
+    align-items: center;
+    padding-block: var(--space-9);
+  }
+  .about__ph {
+    aspect-ratio: 4 / 5;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+  }
+  .about__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  .about__title {
+    font-size: var(--text-hero);
+  }
+  .about__lead {
+    font-size: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+    line-height: 1.5;
+    color: var(--color-text-soft);
+  }
+  .about__body {
+    max-width: 40rem;
+    color: var(--color-text-body);
+  }
+  .about__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-5) var(--space-6);
+    margin-top: var(--space-3);
+  }
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin: var(--space-5) 0 var(--space-8);
+    padding: 0;
+  }
+  .principle {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+  }
+  .principle h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  .principle p {
+    color: var(--color-text-muted);
+  }
+  .skills__label {
+    margin-bottom: var(--space-4);
+  }
+  .skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+  }
+  @media (max-width: 960px) {
+    .about {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .about__photo {
+      max-width: 22rem;
+    }
+    .principles {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
