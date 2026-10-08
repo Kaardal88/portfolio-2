@@ -1,10 +1,13 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 
+import sitemap from '@astrojs/sitemap';
+
 // https://docs.astro.build/en/reference/configuration-reference/
 export default defineConfig({
-  // Replace with your real domain once the site is deployed (used for canonical URLs and Open Graph).
-  site: 'https://example.com',
+  // The live domain, used for canonical URLs, Open Graph and the sitemap.
+  site: 'https://kaardal.netlify.app',
+
   vite: {
     server: {
       // The file watcher missed saves on this machine, so the dev server kept serving
@@ -12,4 +15,6 @@ export default defineConfig({
       watch: { usePolling: true, interval: 300 },
     },
   },
+
+  integrations: [sitemap({ filter: (page) => !page.includes('/404') })],
 });

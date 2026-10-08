@@ -8,9 +8,23 @@ import { site } from '../site.config';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const orbit = ['Game ideas', 'AI workflows', 'Music', 'Woodturning', 'Art'];
+
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  jobTitle: site.role,
+  url: Astro.site?.href,
+  image: new URL('/images/kimmen.jpg', Astro.site).href,
+  email: `mailto:${site.email}`,
+  sameAs: [site.github, site.linkedin],
+  knowsAbout: ['Frontend development', 'UX design', 'JavaScript', 'TypeScript', 'React', 'Astro'],
+};
 ---
 
 <BaseLayout>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(person)} />
   <section class="hero container" aria-labelledby="hero-title">
     <div class="hero__text">
       <p class="eyebrow">{site.role}</p>

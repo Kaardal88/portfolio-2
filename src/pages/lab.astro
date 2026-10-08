@@ -25,7 +25,10 @@ const failedCount = Math.max(0, started - shipped);
 const rate = started ? Math.round((shipped / started) * 100) : 0;
 ---
 
-<BaseLayout title="Lab" description="Side quests and other questionable decisions: music, games, art, woodturning and more.">
+<BaseLayout
+  title="Lab"
+  description={`Side quests and questionable decisions: game ideas, AI workflows, music, art and woodturning. ${started} ideas started, ${shipped} shipped.`}
+>
   <section class="container lab-hero" aria-labelledby="lab-title">
     <div class="lab-hero__text">
       <p class="eyebrow">The Lab / What the brain does after hours</p>

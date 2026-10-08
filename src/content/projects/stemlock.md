@@ -2,7 +2,7 @@
 title: StemLock
 order: 1
 category: Exam project · Artist platform
-summary: "The school project who became a real product vision. StemLock is for all people in the music industry. It makes it easier to collaborate with the band, guest artists, manager or studio engineer."
+summary: "StemLock is for all people in the music industry. It makes it easier to collaborate with the band, guest artists, manager or studio engineer."
 shortSummary: "A tool for musicians and their network."
 role: "Fullstack, designer, product thinker"
 year: "2026"
