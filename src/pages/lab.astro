@@ -113,6 +113,32 @@ const rate = started ? Math.round((shipped / started) * 100) : 0;
     </ul>
   </section>
 
+  <section class="container section-pad" aria-label="Kaldvard on Spotify">
+    <div class="hobby">
+      <div class="hobby__media">
+        <img src="/images/kaldvard-band.jpg" alt="Kaldvard" loading="lazy" />
+      </div>
+      <div class="hobby__body">
+        <div class="hobby__top">
+          <h3>Kaldvard on Spotify</h3>
+          <span class="status status--new">Spotify</span>
+        </div>
+        <div class="embed">
+          <iframe
+            title="Kaldvard on Spotify"
+            src="https://open.spotify.com/embed/artist/1vu9Qkz45TQXjB2DivPQ8H?utm_source=generator&theme=0"
+            height="352"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            allowfullscreen
+            loading="lazy"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+
+  </section>
+
   <section class="container section-pad lab-end" aria-labelledby="end-title">
     <h2 id="end-title" class="display lab-end__title">Every side quest makes the <span class="accent">real work</span> better.</h2>
     <div class="lab-end__actions">
@@ -419,6 +445,20 @@ const rate = started ? Math.round((shipped / started) * 100) : 0;
   }
   .specs dd {
     text-align: right;
+  }
+
+  /* Third-party embed: the content inside is Spotify's, so only the frame is styled. */
+  .embed {
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--color-surface-2);
+  }
+  .embed iframe {
+    display: block;
+    width: 100%;
+    border: 0;
+    background: var(--color-surface-2);
   }
 
   .lab-end {

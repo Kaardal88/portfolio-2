@@ -1,13 +1,13 @@
 [
   {
     "id": "band",
-    "image": "/images/kaldvard.jpg",
+    "image": "/images/kaldvard-coverart.jpg",
     "category": "music",
     "categoryLabel": "Music",
-    "title": "The band",
+    "title": "Kaldvard",
     "status": "Active",
     "statusTone": "active",
-    "hint": "Same brain, different frequency. [Band name], where I play [instrument] and occasionally argue about tempo.",
+    "hint": "I run a hobby band together with a vocalist. We started in 2017 and release music when we feel like it. I create the music, record and mix it, and Jan Magne writes the lyrics and growls. We have also worked with other musicians from Helheim, Aeternus, Skuld and local fiddle players (I do not fool around).",
     "imagePlaceholder": "Photo: the band live or in rehearsal",
     "specs": [
       { "label": "Role", "value": "Guitar, Bass, Producer" },
