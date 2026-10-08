@@ -1,5 +1,6 @@
 ---
 import { site } from '../site.config';
+import Icon from './Icon.astro';
 const year = new Date().getFullYear();
 ---
 
@@ -7,9 +8,16 @@ const year = new Date().getFullYear();
   <div class="footer__inner container">
     <span class="mono footer__small">© {year} {site.name}</span>
     <ul class="footer__links">
-      <li><a href={site.github} rel="me noopener" target="_blank">GitHub</a></li>
-      <li><a href={site.linkedin} rel="me noopener" target="_blank">LinkedIn</a></li>
-
+      <li>
+        <a href={site.github} rel="me noopener" target="_blank">
+          GitHub <Icon name="arrow-up-right" size={14} /><span class="visually-hidden"> (opens in a new tab)</span>
+        </a>
+      </li>
+      <li>
+        <a href={site.linkedin} rel="me noopener" target="_blank">
+          LinkedIn <Icon name="arrow-up-right" size={14} /><span class="visually-hidden"> (opens in a new tab)</span>
+        </a>
+      </li>
     </ul>
     <span class="mono footer__small footer__motto">Same brain. More ideas.</span>
   </div>
@@ -43,12 +51,28 @@ const year = new Date().getFullYear();
     list-style: none;
   }
   .footer__links a {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
     padding: var(--space-3) 0;
     font-size: 0.9375rem;
     color: var(--color-text-soft);
+    text-decoration: underline;
+    text-decoration-color: var(--color-line-strong);
+    text-underline-offset: 0.3em;
+    transition:
+      color var(--dur),
+      text-decoration-color var(--dur);
+  }
+  .footer__links a :global(svg) {
+    color: var(--color-accent);
+    transition: transform var(--dur) var(--ease);
   }
   .footer__links a:hover {
-    color: #fff;
+    color: var(--color-accent);
+    text-decoration-color: var(--color-accent);
+  }
+  .footer__links a:hover :global(svg) {
+    transform: translate(2px, -2px);
   }
 </style>

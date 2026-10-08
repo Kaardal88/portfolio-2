@@ -22,7 +22,7 @@
   --color-accent-ink: #04110f; /* text on accent */
   --color-violet: #9b8cff; /* secondary thoughts, badges */
   --color-green: #8be37a; /* "new" states */
-  --color-amber: #f2c14e; /* "successfully failed" only */
+  --color-amber: #f2c14e; /* "successfully failed", skill and hobby chips */
 
   /* Type */
   --font-display: 'Archivo', system-ui, sans-serif;
