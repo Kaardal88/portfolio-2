@@ -7,6 +7,8 @@ shortSummary: A online shop with a shopping cart, checkout page and a receipt
 role: "Frontend developer, UX designer"
 year: "2026"
 stack: ["[NextJS]", "[React]", "[Typescript]", "[Tailwind CSS]"]
+liveUrl: https://onlineshopandget.netlify.app/
+repoUrl: https://github.com/Kaardal88/next-ca26
 client: School project
 badge: "School project"
 cover: "/images/shopnGet-js.png"

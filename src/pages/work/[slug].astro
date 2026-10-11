@@ -51,8 +51,8 @@ const nextNum = String(next.data.order).padStart(2, '0');
       <div class="intro__row">
         <p class="intro__summary">{d.summary}</p>
         <div class="intro__actions">
-          {d.liveUrl && <a class="btn" href={d.liveUrl}>View live site <Icon name="arrow-up-right" /></a>}
-          {d.repoUrl && <a class="btn btn--ghost" href={d.repoUrl}><Icon name="code" /> Repository</a>}
+          {d.liveUrl && <a class="btn" href={d.liveUrl} target="_blank" rel="noopener noreferrer">View live site <Icon name="arrow-up-right" /></a>}
+          {d.repoUrl && <a class="btn btn--ghost" href={d.repoUrl} target="_blank" rel="noopener noreferrer"><Icon name="code" /> Repository</a>}
         </div>
       </div>
       <dl class="facts">
